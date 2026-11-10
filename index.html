@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>اختبار الوحدة الثانية — المعادلات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#f5f3ff;--bg2:#ecfeff;--ink:#1e1b4b;--muted:#6b7280;--card:#fff;--line:#e9e5ff;
+  --l1:#059669;--l1s:#d1fae5;--l2:#4f46e5;--l2s:#e0e7ff;--l3:#d97706;--l3s:#fef3c7;
+  --pri:#7c3aed;--pri2:#a855f7;--ok:#16a34a;--bad:#dc2626;--fs:17px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;font-size:var(--fs);color:var(--ink);
+  background:radial-gradient(1200px 600px at 100% -10%,#ede9fe 0,transparent 60%),radial-gradient(900px 500px at -10% 110%,#cffafe 0,transparent 55%),linear-gradient(160deg,var(--bg1),var(--bg2));
+  min-height:100vh;line-height:1.6}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;color:inherit;background:none}
+input,select{font-family:inherit;font-size:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 120px}
+.hidden{display:none!important}
+.demo{background:#fff7ed;border:1px dashed #fb923c;color:#9a3412;border-radius:14px;padding:8px 12px;font-size:.85em;margin-bottom:12px;text-align:center}
+.demo a{color:#7c2d12;font-weight:700}
+/* ---------- welcome ---------- */
+.hero{background:linear-gradient(135deg,#6d28d9,#a855f7 55%,#ec4899);color:#fff;border-radius:28px;padding:26px 22px 22px;position:relative;overflow:hidden;box-shadow:0 20px 40px -18px #6d28d9aa}
+.hero h1{margin:6px 0 4px;font-size:1.65em;line-height:1.25}
+.hero p{margin:0;opacity:.92}
+.hero .eqs{position:absolute;inset:0;pointer-events:none;opacity:.16;font-weight:800;direction:ltr}
+.hero .eqs span{position:absolute;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{background:#ffffff26;border:1px solid #ffffff40;border-radius:999px;padding:4px 12px;font-size:.85em;backdrop-filter:blur(4px)}
+.card{background:var(--card);border-radius:22px;padding:20px;box-shadow:0 10px 30px -18px #4c1d9555;border:1px solid var(--line);margin-top:16px}
+.lv-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.lv{border-radius:18px;padding:12px 10px;text-align:center;font-size:.86em}
+.lv b{display:block;font-size:1.25em}
+.lv.l1{background:var(--l1s);color:#065f46}.lv.l2{background:var(--l2s);color:#3730a3}.lv.l3{background:var(--l3s);color:#92400e}
+.lv .ic{font-size:1.6em;display:block}
+label.f{display:block;font-weight:700;margin:14px 0 6px;font-size:.92em}
+.inp{width:100%;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:#faf9ff;outline:none;transition:.2s}
+.inp:focus{border-color:var(--pri);background:#fff;box-shadow:0 0 0 4px #ede9fe}
+.code{letter-spacing:.35em;text-align:center;font-weight:800;text-transform:uppercase;direction:ltr}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;border-radius:16px;font-weight:800;transition:transform .12s,box-shadow .2s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;box-shadow:0 10px 22px -10px var(--pri)}
+.btn.ghost{background:#f3f0ff;color:#5b21b6}
+.btn.block{width:100%}
+.btn:disabled{opacity:.55}
+.err{color:var(--bad);font-weight:700;min-height:1.4em;margin-top:10px;font-size:.92em}
+.rules{margin:0;padding-inline-start:20px;color:#374151;font-size:.92em}
+.rules li{margin:4px 0}
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:20;background:#ffffffd9;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .in{max-width:760px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.who{flex:1;min-width:0}
+.who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95em}
+.who small{color:var(--muted);font-size:.78em}
+.timer{display:flex;align-items:center;gap:6px;background:#f5f3ff;color:#5b21b6;padding:6px 12px;border-radius:999px;font-weight:800;direction:ltr;font-variant-numeric:tabular-nums}
+.timer.warn{background:#fee2e2;color:#b91c1c;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.tool{width:38px;height:38px;border-radius:12px;background:#f5f3ff;display:grid;place-items:center;font-weight:800;color:#5b21b6;font-size:.9em}
+.prog{height:6px;background:#eef2ff}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--l1),var(--l2),var(--l3));transition:width .4s;border-radius:0 6px 6px 0}
+/* ---------- level tabs ---------- */
+.tabs{display:flex;gap:8px;margin:14px 0 4px;overflow-x:auto}
+.tab{flex:1;min-width:110px;border-radius:14px;padding:8px 10px;font-weight:700;font-size:.85em;border:2px solid transparent;background:#fff;text-align:center;white-space:nowrap}
+.tab.l1{color:var(--l1)}.tab.l2{color:var(--l2)}.tab.l3{color:var(--l3)}
+.tab.on.l1{background:var(--l1s);border-color:var(--l1)}.tab.on.l2{background:var(--l2s);border-color:var(--l2)}.tab.on.l3{background:var(--l3s);border-color:var(--l3)}
+/* ---------- question ---------- */
+.q{animation:slide .35s ease}
+@keyframes slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.qh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qn{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:1.05em}
+.l1 .qn,.qn.l1{background:linear-gradient(135deg,#10b981,#059669)}
+.l2 .qn,.qn.l2{background:linear-gradient(135deg,#6366f1,#4338ca)}
+.l3 .qn,.qn.l3{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+.tag{font-size:.75em;padding:3px 10px;border-radius:999px;font-weight:700}
+.tag.l1{background:var(--l1s);color:#065f46}.tag.l2{background:var(--l2s);color:#3730a3}.tag.l3{background:var(--l3s);color:#92400e}
+.tag.pts{background:#fdf2f8;color:#9d174d}
+.speak{margin-inline-start:auto}
+.qt{font-size:1.08em;font-weight:700;margin:14px 0 6px}
+.eq{direction:ltr;text-align:center;font-size:1.55em;font-weight:800;background:linear-gradient(135deg,#faf5ff,#eef2ff);border-radius:18px;padding:16px 10px;margin:10px 0 14px;letter-spacing:.02em;color:#312e81;border:1px dashed #c4b5fd}
+.mx{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:800}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.8em;margin:0 2px}
+.fr span:first-child{border-bottom:2px solid currentColor;padding:0 3px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:16px;border:2px solid var(--line);background:#fff;text-align:start;transition:.15s;width:100%}
+.opt:hover{border-color:#c4b5fd}
+.opt .let{width:34px;height:34px;flex:none;border-radius:11px;background:#f3f0ff;display:grid;place-items:center;font-weight:800;color:#6d28d9}
+.opt.sel{border-color:var(--pri);background:#faf5ff;box-shadow:0 6px 16px -10px var(--pri)}
+.opt.sel .let{background:var(--pri);color:#fff}
+.opt .tx{font-size:1.08em}
+.opts.two{grid-template-columns:1fr 1fr}
+/* numeric */
+.numbox{display:flex;align-items:center;gap:10px;justify-content:center;direction:ltr;margin:6px 0}
+.numbox .pre{font-weight:800;font-size:1.3em;color:#4338ca}
+.numbox input{width:170px;text-align:center;font-size:1.4em;font-weight:800;padding:10px;border-radius:16px;border:2px solid #c7d2fe;background:#fff;outline:none;direction:ltr}
+.numbox input:focus{border-color:var(--l2);box-shadow:0 0 0 4px #e0e7ff}
+.numbox .unit{font-size:.9em;color:var(--muted);direction:rtl}
+.kp{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:420px;margin:8px auto 0;direction:ltr}
+.kp button{padding:9px 0;border-radius:11px;background:#f1f5f9;font-weight:800;font-size:1em}
+.kp button:active{background:#e0e7ff}
+.kp .sp{background:#ede9fe;color:#5b21b6}
+/* hint */
+.hintb{margin-top:14px;display:flex;justify-content:flex-start}
+.hint{margin-top:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:10px 12px;color:#78350f;font-size:.93em}
+/* order */
+.slots{display:grid;gap:8px;margin:8px 0 14px}
+.slot{display:flex;align-items:center;gap:10px;border:2px dashed #c7d2fe;border-radius:14px;padding:10px 12px;min-height:50px;background:#f8faff}
+.slot .k{width:28px;height:28px;flex:none;border-radius:9px;background:#e0e7ff;color:#3730a3;display:grid;place-items:center;font-weight:800;font-size:.9em}
+.slot.full{border-style:solid;border-color:var(--l2);background:#fff}
+.slot .x{margin-inline-start:auto;color:#9ca3af;font-weight:800}
+.pool{display:grid;gap:8px}
+.step{padding:11px 12px;border-radius:14px;background:#fff;border:2px solid #e0e7ff;text-align:start;width:100%;box-shadow:0 4px 10px -8px #4338ca}
+.step.used{opacity:.3;pointer-events:none}
+/* classify */
+.cls{display:grid;gap:12px}
+.crow{border:2px solid var(--line);border-radius:16px;padding:12px}
+.crow .e{direction:ltr;text-align:center;font-weight:800;font-size:1.15em;margin-bottom:8px;color:#312e81}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{padding:9px 4px;border-radius:12px;background:#f3f4f6;font-size:.82em;font-weight:700;line-height:1.3}
+.seg button.sel{background:var(--l2);color:#fff}
+/* notebook */
+.note{background:repeating-linear-gradient(#fff 0 34px,#dbeafe 34px 35px);border-radius:16px;border:1px solid #bfdbfe;padding:6px 16px 6px;position:relative;margin:8px 0 14px}
+.note:before{content:'';position:absolute;top:0;bottom:0;right:44px;border-right:2px solid #fca5a5}
+.note div{height:35px;line-height:35px;direction:ltr;text-align:left;font-weight:800;font-size:1.1em;color:#1e3a8a;padding-left:6px}
+.note div small{color:#9ca3af;font-weight:500;margin-right:8px}
+.sub{border-top:1px dashed #e5e7eb;padding-top:14px;margin-top:14px}
+.sub .sh{display:flex;gap:8px;align-items:center;font-weight:700;margin-bottom:10px}
+.sub .sn{width:28px;height:28px;border-radius:9px;background:var(--l3s);color:#92400e;display:grid;place-items:center;font-weight:800;font-size:.85em;flex:none}
+.sub .sp2{font-size:.75em;color:#9d174d;background:#fdf2f8;border-radius:999px;padding:2px 8px;margin-inline-start:auto;white-space:nowrap}
+/* tracks */
+.story{background:linear-gradient(135deg,#fffbeb,#fff7ed);border:1px solid #fde68a;border-radius:18px;padding:14px;margin:10px 0}
+.story svg{display:block;margin:6px auto 0;max-width:100%}
+.trk{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.trk button{border-radius:18px;padding:16px 12px;text-align:center;border:2px solid transparent;transition:.15s}
+.trk .s{background:#ecfdf5;border-color:#a7f3d0}
+.trk .c{background:#fff1f2;border-color:#fecdd3}
+.trk button:hover{transform:translateY(-2px)}
+.trk .ic{font-size:2em;display:block}
+.trk b{display:block;font-size:1.02em;margin:4px 0}
+.trk small{color:#4b5563;font-size:.8em;display:block;line-height:1.45}
+.trkbar{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.88em}
+.trkbar .badge{padding:4px 12px;border-radius:999px;font-weight:800}
+.badge.s{background:#d1fae5;color:#065f46}.badge.c{background:#ffe4e6;color:#9f1239}
+.link{color:#6d28d9;font-weight:700;text-decoration:underline;font-size:.9em}
+/* bottom nav */
+.nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffeb;backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.nav .in{max-width:760px;margin:0 auto;padding:10px 14px;display:flex;gap:8px;align-items:center}
+.nav .btn{padding:12px 16px}
+.nav .grow{flex:1}
+/* map */
+.map{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.mc{aspect-ratio:1;border-radius:12px;font-weight:800;display:grid;place-items:center;border:2px solid #e5e7eb;background:#fff;color:#6b7280;font-size:.95em;position:relative}
+.mc.l1.done{background:var(--l1);border-color:var(--l1);color:#fff}
+.mc.l2.done{background:var(--l2);border-color:var(--l2);color:#fff}
+.mc.l3.done{background:var(--l3);border-color:var(--l3);color:#fff}
+.mc.part{border-style:dashed;border-color:#f59e0b;color:#b45309}
+.mc.cur{outline:3px solid #a78bfa;outline-offset:2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78em;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:middle;margin-inline-end:4px}
+/* modal */
+.ov{position:fixed;inset:0;background:#1e1b4b80;z-index:50;display:grid;place-items:center;padding:16px;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.md{background:#fff;border-radius:24px;max-width:460px;width:100%;padding:22px;max-height:88vh;overflow:auto;animation:pop .25s}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.md h3{margin:0 0 8px}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:10px 16px;border-radius:14px;z-index:60;font-size:.88em;box-shadow:0 10px 25px -10px #000;animation:fade .2s;max-width:90%}
+/* result */
+.res{text-align:center}
+.ring{width:210px;height:210px;margin:6px auto 4px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;align-content:center}
+.ring .v b{font-size:3.2em;line-height:1;color:#4c1d95}
+.ring .v span{color:var(--muted)}
+.grade{display:inline-block;padding:6px 18px;border-radius:999px;font-weight:800;font-size:1.1em;margin:6px 0 4px}
+.bars{display:grid;gap:12px;text-align:start;margin-top:18px}
+.bar .lb{display:flex;justify-content:space-between;font-size:.9em;font-weight:700}
+.bar .tr{height:12px;border-radius:99px;background:#f1f5f9;overflow:hidden;margin-top:4px}
+.bar .tr i{display:block;height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.conf{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.conf i{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.big .eq{font-size:1.85em}
+@media (max-width:420px){.eq{font-size:1.3em}.trk{grid-template-columns:1fr}.opts.two{grid-template-columns:1fr}.kp button{padding:8px 0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+
+<script>
+// ===================== مفتاح التصحيح (لا يُرسل إلى أجهزة الطالبات) =====================
+// المجموع: المستوى 1 = 10 ، المستوى 2 = 12 ، المستوى 3 = 8  →  30 علامة
+var EXAM_TOTAL = 30;
+var EXAM_MINUTES = 45;
+
+var SCORING = {
+  // ---------- المستوى 1: تأسيسي (علامة لكل سؤال) ----------
+  q1:  { level: 1, max: 1, type: 'mcq', ans: 'b', label: 'x ÷ 4 = 3' },
+  q2:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: '(2/3)x = 10' },
+  q3:  { level: 1, max: 1, type: 'mcq', ans: 'd', label: '3x + 5 = 20' },
+  q4:  { level: 1, max: 1, type: 'mcq', ans: 'a', label: '−2x − 7 = 9' },
+  q5:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: 'x/5 − 4 = 2' },
+  q6:  { level: 1, max: 1, type: 'mcq', ans: 'b', label: '5x = 2x + 18' },
+  q7:  { level: 1, max: 1, type: 'mcq', ans: 'd', label: '7x − 4 = 3x + 12' },
+  q8:  { level: 1, max: 1, type: 'mcq', ans: 'a', label: '4(x − 2) = 20' },
+  q9:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: 'معادلة ليس لها حل' },
+  q10: { level: 1, max: 1, type: 'mcq', ans: 'b', label: 'كتابة معادلة من جملة' },
+  // ---------- المستوى 2: تطبيقي (علامتان لكل سؤال) ----------
+  q11: { level: 2, max: 2, type: 'num', ans: 8, label: '0.4x − 1.2 = 2' },
+  q12: { level: 2, max: 2, type: 'num', ans: -4, label: '−3(x + 4) = 2x + 8' },
+  q13: { level: 2, max: 2, type: 'num', ans: 6, label: '2(3x − 1) − 4x = 10' },
+  q14: { level: 2, max: 2, type: 'order', ans: ['p', 'k', 'w', 'm'], label: 'ترتيب خطوات الحل' },
+  q15: { level: 2, max: 2, type: 'classify', ans: { a: 'inf', b: 'none', c: 'one' }, label: 'عدد الحلول' },
+  q16: { level: 2, max: 2, type: 'multi', label: 'تحليل الخطأ',
+         parts: { a: { type: 'mcq', ans: 'b', pts: 1 }, b: { type: 'num', ans: 6, pts: 1 } } },
+  // ---------- المستوى 3: حل المشكلات (4 علامات لكل مسألة، بمسارين) ----------
+  q17: { level: 3, max: 4, type: 'track', label: 'مسألة تأجير الدراجات',
+         support:   { g1: { type: 'mcq', ans: 'c', pts: 1 }, g2: { type: 'mcq', ans: 'b', pts: 1 },
+                      g3: { type: 'num', ans: 5, pts: 1 },   g4: { type: 'num', ans: 45, pts: 1 } },
+         challenge: { c1: { type: 'num', ans: 5, pts: 2 },   c2: { type: 'num', ans: 45, pts: 1 },
+                      c3: { type: 'mcq', ans: 'a', pts: 1 } } },
+  q18: { level: 3, max: 4, type: 'track', label: 'مسألة محيط المستطيل',
+         support:   { g1: { type: 'mcq', ans: 'd', pts: 1 }, g2: { type: 'mcq', ans: 'b', pts: 1 },
+                      g3: { type: 'num', ans: 6, pts: 1 },   g4: { type: 'num', ans: 15, pts: 1 } },
+         challenge: { c1: { type: 'num', ans: 6, pts: 2 },   c2: { type: 'num', ans: 15, pts: 1 },
+                      c3: { type: 'num', ans: 90, pts: 1 } } }
+};
+
+// المعادلات تُعرض من اليسار لليمين داخل الجداول العربية
+(function () { for (var k in SCORING) if (!/[؀-ۿ]/.test(SCORING[k].label)) SCORING[k].label = '‎' + SCORING[k].label + '‎'; })();
+
+var QUESTION_IDS = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18'];
+
+// يقبل الأرقام العربية والهندية، والكسور a/b، والفاصلة العشرية، وإشارة السالب بأشكالها
+function parseNum(s) {
+  if (s === null || s === undefined) return NaN;
+  s = String(s).trim();
+  if (!s) return NaN;
+  var map = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
+              '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9' };
+  s = s.replace(/[٠-٩۰-۹]/g, function (c) { return map[c]; })
+       .replace(/[−–—‐]/g, '-').replace(/[٫,]/g, '.').replace(/\s+/g, '')
+       .replace(/^x=/i, '').replace(/^[a-z]=/i, '');
+  var m = s.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if (m) { var d = parseFloat(m[2]); return d === 0 ? NaN : parseFloat(m[1]) / d; }
+  if (!/^-?\d*\.?\d+$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+
+function numEq(a, b) { var x = parseNum(a); return !isNaN(x) && Math.abs(x - b) < 1e-6; }
+
+function scorePart(spec, val) {
+  if (spec.type === 'mcq') return val === spec.ans ? spec.pts : 0;
+  if (spec.type === 'num') return numEq(val, spec.ans) ? spec.pts : 0;
+  return 0;
+}
+
+// answers: { q1:'b', q11:'8', q14:['p','k','w','m'], q15:{a:'inf',...}, q16:{a:'b',b:'6'}, q17:{g1:'c',...} }
+// tracks:  { q17:'support' | 'challenge', q18: ... }
+function scoreExam(answers, tracks) {
+  answers = answers || {}; tracks = tracks || {};
+  var perQ = {}, levels = { 1: 0, 2: 0, 3: 0 }, total = 0;
+  QUESTION_IDS.forEach(function (id) {
+    var sp = SCORING[id], a = answers[id], p = 0;
+    if (sp.type === 'mcq') p = a === sp.ans ? sp.max : 0;
+    else if (sp.type === 'num') p = numEq(a, sp.ans) ? sp.max : 0;
+    else if (sp.type === 'order') {
+      var ok = 0;
+      if (Object.prototype.toString.call(a) === '[object Array]')
+        for (var i = 0; i < sp.ans.length; i++) if (a[i] === sp.ans[i]) ok++;
+      p = ok === sp.ans.length ? 2 : (ok >= 2 ? 1 : 0);
+    } else if (sp.type === 'classify') {
+      var c = 0; a = a || {};
+      for (var k in sp.ans) if (a[k] === sp.ans[k]) c++;
+      p = c === 3 ? 2 : (c === 2 ? 1 : 0);
+    } else if (sp.type === 'multi') {
+      a = a || {};
+      for (var pk in sp.parts) p += scorePart(sp.parts[pk], a[pk]);
+    } else if (sp.type === 'track') {
+      var tr = tracks[id] === 'challenge' ? 'challenge' : (tracks[id] === 'support' ? 'support' : null);
+      a = a || {};
+      if (tr) for (var sk in sp[tr]) p += scorePart(sp[tr][sk], a[sk]);
+    }
+    perQ[id] = p; levels[sp.level] += p; total += p;
+  });
+  return { total: total, levels: levels, perQ: perQ };
+}
+
+function gradeLabel(total) {
+  if (total >= 27) return 'ممتاز';
+  if (total >= 24) return 'جيد جدًا';
+  if (total >= 20) return 'جيد';
+  if (total >= 15) return 'مقبول';
+  return 'بحاجة إلى دعم';
+}
+
+var EMAIL_CFG={"email": "leen.albrdan95@gmail.com", "code": "EQ8", "pin": "2468", "salt": "m8-eq-uae-26", "url": "https://leenalbrdan95-del.github.io/Leen/"};
+var PREFILL = "";
+var SECTIONS = ["8/1", "8/2", "8/3", "8/4", "8/5", "8/6", "8/7", "8/8"];
+</script>
+<script>
+(function(){
+'use strict';
+var LIVE = typeof google !== 'undefined' && google.script && google.script.run;
+var EM = (typeof EMAIL_CFG !== 'undefined') ? EMAIL_CFG : null;
+if(EM && !PREFILL){ var hh=(location.hash||'').replace('#',''); if(/^[A-Za-z0-9]{2,12}$/.test(hh) && hh!=='teacher') PREFILL=hh; }
+var MINUTES = 45, TOTAL = 30, STORE = 'eq8_unit2_exam_v1';
+var $ = function(s,r){return (r||document).querySelector(s)};
+var esc = function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var fr = function(a,b){return '<span class="fr"><span>'+a+'</span><span>'+b+'</span></span>'};
+var mx = function(s){return '<span class="mx">'+s+'</span>'};
+var LET = ['أ','ب','ج','د'];
+
+// ===================== الأسئلة =====================
+var Q = [
+ {id:'q1',level:1,pts:1,skill:'معادلة بخطوة واحدة',text:'حلّي المعادلة الآتية:',eq:'x ÷ 4 = 3',
+  opts:[['b','x = 12'],['a','x = 7'],['c','x = '+fr(3,4)],['d','x = −1']]},
+ {id:'q2',level:1,pts:1,skill:'معاملات نسبية',text:'حلّي المعادلة الآتية:',eq:fr(2,3)+' x = 10',
+  opts:[['a','x = '+fr(20,3)],['b','x = 20'],['c','x = 15'],['d','x = 10'+fr(2,3)]]},
+ {id:'q3',level:1,pts:1,skill:'معادلة بخطوتين',text:'حلّي المعادلة الآتية:',eq:'3x + 5 = 20',
+  opts:[['a','x = 15'],['b','x = '+fr(25,3)],['c','x = 4'],['d','x = 5']]},
+ {id:'q4',level:1,pts:1,skill:'معادلة بخطوتين',text:'حلّي المعادلة الآتية:',eq:'−2x − 7 = 9',
+  opts:[['a','x = −8'],['b','x = 8'],['c','x = −1'],['d','x = 1']]},
+ {id:'q5',level:1,pts:1,skill:'معاملات نسبية',text:'حلّي المعادلة الآتية:',eq:fr('x',5)+' − 4 = 2',
+  opts:[['a','x = 10'],['b','x = −10'],['c','x = 30'],['d','x = '+fr(6,5)]]},
+ {id:'q6',level:1,pts:1,skill:'متغيرات في الطرفين',text:'حلّي المعادلة الآتية:',eq:'5x = 2x + 18',
+  opts:[['a','x = '+fr(18,7)],['b','x = 6'],['c','x = 3'],['d','x = 9']]},
+ {id:'q7',level:1,pts:1,skill:'متغيرات في الطرفين',text:'حلّي المعادلة الآتية:',eq:'7x − 4 = 3x + 12',
+  opts:[['a','x = 2'],['b','x = 0.8'],['c','x = −4'],['d','x = 4']]},
+ {id:'q8',level:1,pts:1,skill:'خاصية التوزيع',text:'حلّي المعادلة الآتية:',eq:'4(x − 2) = 20',
+  opts:[['a','x = 7'],['b','x = 5.5'],['c','x = 3'],['d','x = 6']]},
+ {id:'q9',level:1,pts:1,skill:'عدد الحلول',text:'أيّ المعادلات الآتية <b>ليس لها حل</b>؟',
+  opts:[['a',mx('2x + 4 = 2(x + 2)')],['b',mx('x + 1 = 2x − 3')],['c',mx('3x + 2 = 3x − 5')],['d',mx('5x = 0')]]},
+ {id:'q10',level:1,pts:1,skill:'كتابة المعادلات',text:'أيّ معادلة تمثّل الجملة: «أربعة أمثال عدد مضافًا إليها 6 تساوي 34»؟',
+  opts:[['a',mx('4(n + 6) = 34')],['b',mx('4n + 6 = 34')],['c',mx('6n + 4 = 34')],['d',mx('n + 4 = 34 ÷ 6')]]},
+
+ {id:'q11',level:2,pts:2,type:'num',skill:'معاملات عشرية',text:'حلّي المعادلة واكتبي قيمة x:',eq:'0.4x − 1.2 = 2',
+  hint:'اجمعي 1.2 إلى الطرفين أولًا، ثم اقسمي الطرفين على 0.4'},
+ {id:'q12',level:2,pts:2,type:'num',skill:'توزيع ومتغيرات في الطرفين',text:'حلّي المعادلة واكتبي قيمة x:',eq:'−3(x + 4) = 2x + 8',
+  hint:'وزّعي −3 على ما بين القوسين: ‎−3x − 12‎ ، ثم اجمعي حدود x في طرف واحد'},
+ {id:'q13',level:2,pts:2,type:'num',skill:'معادلة متعددة الخطوات',text:'حلّي المعادلة واكتبي قيمة x:',eq:'2(3x − 1) − 4x = 10',
+  hint:'وزّعي 2 أولًا، ثم اجمعي الحدود المتشابهة: ‎6x − 4x‎'},
+ {id:'q14',level:2,pts:2,type:'order',skill:'خطوات الحل',text:'رتّبي خطوات حل المعادلة الآتية بالضغط عليها حسب الترتيب الصحيح:',eq:'5x + 3 = 2x − 9',
+  steps:[['w',mx('x = −4')+' &nbsp;← قسمة الطرفين على 3'],['m','التحقق: '+mx('5(−4) + 3 = −17 = 2(−4) − 9')+' ✔'],
+         ['p',mx('3x + 3 = −9')+' &nbsp;← طرح 2x من الطرفين'],['k',mx('3x = −12')+' &nbsp;← طرح 3 من الطرفين']],
+  hint:'ابدئي بجمع حدود المتغير x في طرف واحد، والتحقق دائمًا آخر خطوة'},
+ {id:'q15',level:2,pts:2,type:'classify',skill:'عدد الحلول',text:'حدّدي عدد حلول كل معادلة:',
+  rows:[['a','2(x + 3) = 2x + 6'],['b','4x − 1 = 4x + 3'],['c','3x + 1 = x + 7']],
+  hint:'بسّطي الطرفين: إذا تساوى معامل x في الطرفين فقارني الثوابت؛ تساويها يعني عددًا لا نهائيًا من الحلول، واختلافها يعني لا حل'},
+ {id:'q16',level:2,pts:2,type:'multi',skill:'تحليل الخطأ',text:'حلّت مريم المعادلة '+mx('3(x − 2) = 12')+' كما يلي:',
+  work:['3(x − 2) = 12','3x − 2 = 12','3x = 14','x = 14/3'],
+  parts:[{k:'a',type:'mcq',label:'أين أخطأت مريم؟',pts:1,opts:[['a','في الخطوة الثالثة: القسمة على 3 خاطئة'],['b','في الخطوة الأولى: لم تضرب 3 في −2 عند التوزيع'],['c','في الخطوة الثانية: كان يجب طرح 2 من الطرفين'],['d','لا يوجد خطأ في الحل']]},
+         {k:'b',type:'num',label:'ما الحل الصحيح للمعادلة؟',pts:1,pre:'x ='}],
+  hint:'احسبي ‎3 × (−2)‎ — ماذا يجب أن تصبح الخطوة الأولى؟'},
+
+ {id:'q17',level:3,pts:4,type:'track',skill:'مسألة حياتية',
+  story:'تؤجّر الشركة <b>(أ)</b> الدراجات الهوائية مقابل <b>20 درهمًا</b> رسومًا ثابتة و<b>5 دراهم</b> لكل ساعة، بينما تؤجّر الشركة <b>(ب)</b> مقابل <b>9 دراهم</b> لكل ساعة دون رسوم ثابتة. لتكن <b>h</b> عدد ساعات الاستئجار.',
+  art:'bike',
+  support:[{k:'g1',type:'mcq',pts:1,label:'أيّ عبارة تمثّل تكلفة الشركة (أ) بعد h ساعة؟',opts:[['a',mx('25h')],['b',mx('5 + 20h')],['c',mx('20 + 5h')],['d',mx('20h + 5h')]]},
+           {k:'g2',type:'mcq',pts:1,label:'أيّ معادلة تعبّر عن تساوي تكلفة الشركتين؟',opts:[['a',mx('20 = 9h + 5h')],['b',mx('20 + 5h = 9h')],['c',mx('5h = 9h + 20')],['d',mx('20 + 9h = 5h')]]},
+           {k:'g3',type:'num',pts:1,label:'حلّي المعادلة: بعد كم ساعة تتساوى التكلفة؟',pre:'h =',unit:'ساعات'},
+           {k:'g4',type:'num',pts:1,label:'عوّضي قيمة h في ‎9h‎: كم تكون التكلفة عندها؟',unit:'درهم'}],
+  challenge:[{k:'c1',type:'num',pts:2,label:'اكتبي معادلة وحلّيها: بعد كم ساعة تتساوى تكلفة الشركتين؟',pre:'h =',unit:'ساعات'},
+             {k:'c2',type:'num',pts:1,label:'كم تكون التكلفة عند تلك الساعة؟',unit:'درهم'},
+             {k:'c3',type:'mcq',pts:1,label:'لرحلة مدتها 8 ساعات، أيّ الشركتين أوفر؟',opts:[['a','الشركة (أ)'],['b','الشركة (ب)'],['c','التكلفة متساوية']]}]},
+ {id:'q18',level:3,pts:4,type:'track',skill:'مسألة هندسية',
+  story:'مستطيل طوله <b>‎(2x + 3)‎ سم</b> وعرضه <b>x سم</b>، ومحيطه <b>42 سم</b>.',
+  art:'rect',
+  support:[{k:'g1',type:'mcq',pts:1,label:'أيّ معادلة تمثّل محيط المستطيل؟',opts:[['a',mx('(2x + 3) + x = 42')],['b',mx('x(2x + 3) = 42')],['c',mx('2x + 3 + 2x = 42')],['d',mx('2(2x + 3) + 2x = 42')]]},
+           {k:'g2',type:'mcq',pts:1,label:'بعد التبسيط تصبح المعادلة:',opts:[['a',mx('4x + 6 = 42')],['b',mx('6x + 6 = 42')],['c',mx('6x + 3 = 42')],['d',mx('3x + 3 = 42')]]},
+           {k:'g3',type:'num',pts:1,label:'حلّي المعادلة:',pre:'x ='},
+           {k:'g4',type:'num',pts:1,label:'طول المستطيل يساوي:',unit:'سم'}],
+  challenge:[{k:'c1',type:'num',pts:2,label:'اكتبي معادلة المحيط وحلّيها لإيجاد x:',pre:'x ='},
+             {k:'c2',type:'num',pts:1,label:'طول المستطيل يساوي:',unit:'سم'},
+             {k:'c3',type:'num',pts:1,label:'مساحة المستطيل تساوي:',unit:'سم²'}]}
+];
+var QBY = {}; Q.forEach(function(q){ q.type = q.type||'mcq'; QBY[q.id]=q; });
+var LVL = {1:{name:'المستوى 1 · تأسيسي',ic:'🌱',max:10},2:{name:'المستوى 2 · تطبيقي',ic:'🚀',max:12},3:{name:'المستوى 3 · حل المشكلات',ic:'🏆',max:8}};
+
+// ===================== الحالة =====================
+var S = load() || {phase:'welcome'};
+function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ var x = JSON.parse(localStorage.getItem(STORE)||'null'); return x && x.phase ? x : null; }catch(e){ return null; } }
+
+function rng(seed){ var h=1779033703^seed.length; for(var i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19;}
+  return function(){ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); var t=(h^=h>>>16)>>>0; return t/4294967296; }; }
+function shuffle(a,r){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(r()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function buildOrder(){
+  var r = rng(S.token||'x');
+  var l1 = shuffle(Q.filter(function(q){return q.level===1}).map(function(q){return q.id}), r);
+  S.order = l1.concat(['q11','q12','q13','q14','q15','q16','q17','q18']);
+  S.optOrder = {};
+  Q.forEach(function(q){ if(q.opts) S.optOrder[q.id] = shuffle(q.opts.map(function(o){return o[0]}), r); });
+}
+function optsFor(q){ var ord = (S.optOrder||{})[q.id]; if(!ord) return q.opts; var m={}; q.opts.forEach(function(o){m[o[0]]=o}); return ord.map(function(k){return m[k]}); }
+
+function status(id){
+  var q = QBY[id], a = (S.answers||{})[id];
+  if(q.type==='mcq') return a ? 'done' : '';
+  if(q.type==='num') return (a && String(a).trim()) ? 'done' : '';
+  if(q.type==='order') return a && a.length===4 ? 'done' : (a && a.length ? 'part':'');
+  if(q.type==='classify'){ var n = a ? Object.keys(a).length : 0; return n===3?'done':(n?'part':''); }
+  if(q.type==='multi'){ var c=0; if(a){ if(a.a) c++; if(a.b && String(a.b).trim()) c++; } return c===2?'done':(c?'part':''); }
+  if(q.type==='track'){ var t=(S.tracks||{})[id]; if(!t) return ''; var subs=q[t], f=0; subs.forEach(function(s){ if(a && a[s.k] && String(a[s.k]).trim()) f++; }); return f===subs.length?'done':'part'; }
+  return '';
+}
+
+// ===================== الشاشة الافتتاحية =====================
+function welcome(err){
+  var secOpts = (SECTIONS||[]).map(function(s){return '<option>'+esc(s)+'</option>'}).join('');
+  $('#app').innerHTML =
+  '<div class="wrap">'+
+  (LIVE||EM?'':'<div class="demo">👩‍🏫 نسخة معاينة للمعلمة — اكتبي أي رمز للبدء، والنتائج هنا لا تُحفظ. <a href="teacher.html">معاينة لوحة المعلمة ←</a></div>')+
+  '<div class="hero"><div class="eqs">'+
+   '<span style="top:12%;left:4%;font-size:30px">3x + 5 = 20</span><span style="top:62%;left:12%;font-size:24px">4(x − 2)</span>'+
+   '<span style="top:30%;right:6%;font-size:40px">x = ?</span><span style="bottom:6%;right:30%;font-size:22px">5x = 2x + 18</span></div>'+
+   '<div style="position:relative"><div class="chip" style="display:inline-block">الرياضيات · الصف الثامن · الفصل الأول</div>'+
+   '<h1>اختبار الوحدة الثانية<br>المعادلات ✨</h1><p>حلّي المعادلات خطوة بخطوة، وأظهري مهارتك في كل مستوى!</p>'+
+   '<div class="chips"><span class="chip">⏱️ 45 دقيقة</span><span class="chip">🎯 30 علامة</span><span class="chip">📝 18 سؤالًا</span></div></div></div>'+
+  '<div class="lv-row"><div class="lv l1"><span class="ic">🌱</span>تأسيسي<b>10 علامات</b></div>'+
+   '<div class="lv l2"><span class="ic">🚀</span>تطبيقي<b>12 علامة</b></div>'+
+   '<div class="lv l3"><span class="ic">🏆</span>حل المشكلات<b>8 علامات</b></div></div>'+
+  '<div class="card"><form id="f" autocomplete="off">'+
+   '<label class="f">الاسم الثلاثي</label><input class="inp" id="nm" maxlength="80" placeholder="مثال: مريم أحمد الكعبي" value="'+esc(S.name||'')+'">'+
+   '<label class="f">الشعبة</label><select class="inp" id="sc"><option value="">— اختاري الشعبة —</option>'+secOpts+'</select>'+
+   '<label class="f">رمز الاختبار</label><input class="inp code" id="cd" maxlength="12" placeholder="••••" value="'+esc(PREFILL||'')+'">'+
+   '<div class="err" id="er">'+esc(err||'')+'</div>'+
+   '<button class="btn pri block" id="go" type="submit">ابدئي الاختبار 🚀</button></form></div>'+
+  '<div class="card"><b>📌 تعليمات سريعة</b><ul class="rules">'+
+   '<li>يبدأ المؤقت عند الضغط على «ابدئي»، ويُسلَّم الاختبار تلقائيًا بعد 45 دقيقة.</li>'+
+   '<li>تنقّلي بين الأسئلة بحرية، وراجعي خريطة الأسئلة قبل التسليم.</li>'+
+   '<li>في المستوى 2 يمكنك طلب <b>تلميح 💡</b> دون خصم من علامتك.</li>'+
+   '<li>في المستوى 3 اختاري مسارك: <b>🧭 الخطوات الموجّهة</b> أو <b>⚡ التحدي</b> — ولكلٍّ منهما 4 علامات.</li>'+
+   '<li>تُسجَّل مغادرة صفحة الاختبار، فابقي في الصفحة حتى التسليم.</li>'+(EM?'<li><b>بعد التسليم أرسلي نتيجتك بالبريد لمعلمتك من الزر المخصّص — لا تُحتسب النتيجة قبل الإرسال.</b></li>':'')+'</ul></div>'+(EM?'<div style="text-align:center;margin-top:18px"><a href="teacher.html" style="color:#c4b5fd;font-size:.8em;text-decoration:none">👩‍🏫</a></div>':'')+'</div>';
+  if(S.section) $('#sc').value = S.section;
+  $('#f').onsubmit = function(e){ e.preventDefault(); start(); };
+}
+
+function start(){
+  var name = $('#nm').value.trim().replace(/\s+/g,' '), section = $('#sc').value, code = $('#cd').value.trim();
+  var er = $('#er');
+  if(name.split(' ').length < 2){ er.textContent='اكتبي اسمك الثلاثي من فضلك.'; return; }
+  if(!section){ er.textContent='اختاري الشعبة.'; return; }
+  if(!code){ er.textContent='اكتبي رمز الاختبار.'; return; }
+  var b = $('#go'); b.disabled = true; b.textContent = 'جارٍ التحقق…'; er.textContent='';
+  var done = function(r){
+    if(!r || !r.ok){ b.disabled=false; b.textContent='ابدئي الاختبار 🚀'; er.textContent=(r&&r.msg)||'حدث خطأ، حاولي مرة أخرى.'; return; }
+    S = {phase:'exam', token:r.token, name:name, section:section, startedAt:Date.now(), endAt:Date.now()+ (r.minutes||MINUTES)*60000,
+         answers:{}, tracks:{}, hints:{}, blur:0, idx:0};
+    buildOrder(); save(); exam();
+  };
+  if(LIVE) google.script.run.withSuccessHandler(done).withFailureHandler(function(){ done({ok:false,msg:'تعذّر الاتصال. تأكدي من الإنترنت وحاولي مجددًا.'}); }).startExam({name:name,section:section,code:code});
+  else if(EM && code.toUpperCase()!==String(EM.code).toUpperCase()) done({ok:false,msg:'رمز الاختبار غير صحيح. تأكدي منه مع معلمتك.'});
+  else if(EM && localDone(name,section)) done({ok:false,msg:'سبق تسليم الاختبار بهذا الاسم من هذا الجهاز. راجعي معلمتك.'});
+  else setTimeout(function(){ done({ok:true, token:(EM?'e':'demo-')+Date.now(), minutes:MINUTES}); }, 400);
+}
+
+// ===================== شاشة الاختبار =====================
+var tick = null;
+function exam(){
+  $('#app').innerHTML =
+   '<div class="top"><div class="in">'+
+    '<div class="who"><b>'+esc(S.name)+'</b><small>الشعبة '+esc(S.section)+' · المعادلات</small></div>'+
+    '<button class="tool" id="fs" title="حجم الخط">A<sup>±</sup></button>'+
+    '<button class="tool" id="mp" title="خريطة الأسئلة">▦</button>'+
+    '<div class="timer" id="tm">⏱ --:--</div></div><div class="prog"><i id="pg"></i></div></div>'+
+   '<div class="wrap" style="padding-top:6px"><div class="tabs" id="tabs"></div><div id="qv"></div></div>'+
+   '<div class="nav"><div class="in">'+
+    '<button class="btn ghost" id="pv">→ السابق</button><div class="grow"></div>'+
+    '<button class="btn ghost hidden" id="rv">📋 مراجعة</button>'+
+    '<button class="btn pri" id="nx">التالي ←</button></div></div>';
+  $('#pv').onclick = function(){ go(S.idx-1); };
+  $('#nx').onclick = function(){ if(S.idx===S.order.length-1) review(); else go(S.idx+1); };
+  $('#rv').onclick = review;
+  $('#mp').onclick = mapModal;
+  $('#fs').onclick = function(){ var c=['17px','19px','21px']; S.fs = c[(c.indexOf(S.fs||'17px')+1)%3]; document.documentElement.style.setProperty('--fs',S.fs); save(); };
+  if(S.fs) document.documentElement.style.setProperty('--fs',S.fs);
+  clearInterval(tick); tick = setInterval(timer, 1000); timer();
+  render();
+}
+
+function timer(){
+  var left = Math.max(0, S.endAt - Date.now()), m = Math.floor(left/60000), s = Math.floor(left%60000/1000);
+  var el = $('#tm'); if(!el) return;
+  el.textContent = '⏱ ' + (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  el.classList.toggle('warn', left < 5*60000);
+  if(left <= 5*60000 && !S.warned5){ S.warned5 = true; save(); toast('⏰ تبقّت 5 دقائق — راجعي إجاباتك'); }
+  if(left <= 0){ clearInterval(tick); submit(true); }
+}
+
+function go(i){ if(i<0||i>=S.order.length) return; S.idx=i; save(); render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function render(){
+  var id = S.order[S.idx], q = QBY[id], n = S.idx+1;
+  // tabs
+  var firstOf = function(l){ for(var i=0;i<S.order.length;i++) if(QBY[S.order[i]].level===l) return i; };
+  $('#tabs').innerHTML = [1,2,3].map(function(l){
+    var ids = S.order.filter(function(x){return QBY[x].level===l}), d = ids.filter(function(x){return status(x)==='done'}).length;
+    return '<button class="tab l'+l+(q.level===l?' on':'')+'" data-l="'+l+'">'+LVL[l].ic+' '+LVL[l].name.split('·')[1]+' <small>('+d+'/'+ids.length+')</small></button>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){ b.onclick = function(){ go(firstOf(+b.dataset.l)); }; });
+  progress();
+  var h = '<div class="card q l'+q.level+'" id="qc"><div class="qh"><div class="qn">'+n+'</div>'+
+    '<span class="tag l'+q.level+'">'+LVL[q.level].ic+' '+q.skill+'</span><span class="tag pts">'+(q.pts===1?'علامة واحدة':q.pts===2?'علامتان':q.pts+' علامات')+'</span>'+
+    (('speechSynthesis' in window)?'<button class="tool speak" id="sp" title="اقرئي السؤال لي">🔊</button>':'')+'</div>';
+  if(q.type==='track') h += trackView(q);
+  else {
+    if(q.text) h += '<div class="qt">'+q.text+'</div>';
+    if(q.eq) h += '<div class="eq">'+q.eq+'</div>';
+    if(q.type==='mcq') h += mcqView(q.id, null, optsFor(q), (S.answers||{})[q.id], q.level===1 && optsFor(q).every(function(o){return o[1].length<40}));
+    if(q.type==='num') h += numView(q.id, null, 'x =', '');
+    if(q.type==='order') h += orderView(q);
+    if(q.type==='classify') h += classifyView(q);
+    if(q.type==='multi') h += multiView(q);
+    if(q.hint) h += S.hints[q.id] ? '<div class="hint">💡 '+q.hint+'</div>' : '<div class="hintb"><button class="btn ghost" id="hb" style="padding:8px 14px;font-size:.9em">💡 أحتاج تلميحًا</button></div>';
+  }
+  h += '</div>';
+  $('#qv').innerHTML = h;
+  bind(q);
+  $('#pv').style.visibility = S.idx===0 ? 'hidden':'visible';
+  var last = S.idx===S.order.length-1;
+  $('#nx').textContent = last ? 'إنهاء ومراجعة ✓' : 'التالي ←';
+  $('#rv').classList.toggle('hidden', last);
+}
+
+function progress(){
+  var d = S.order.filter(function(x){return status(x)==='done'}).length;
+  var pg = $('#pg'); if(pg) pg.style.width = (d/S.order.length*100)+'%';
+}
+
+function mcqView(qid, sub, opts, val, two){
+  return '<div class="opts'+(two?' two':'')+'">'+opts.map(function(o,i){
+    return '<button class="opt'+(val===o[0]?' sel':'')+'" data-q="'+qid+'" data-s="'+(sub||'')+'" data-v="'+o[0]+'"><span class="let">'+LET[i]+'</span><span class="tx">'+o[1]+'</span></button>';
+  }).join('')+'</div>';
+}
+function numView(qid, sub, pre, unit){
+  var a = S.answers[qid], v = sub ? (a&&a[sub])||'' : (a||'');
+  var keys = ['7','8','9','4','5','6','⌫','1','2','3','0','.','−','/'];
+  return '<div class="numbox">'+(pre?'<span class="pre">'+pre+'</span>':'')+
+    '<input inputmode="decimal" data-q="'+qid+'" data-s="'+(sub||'')+'" value="'+esc(v)+'" placeholder="؟">'+(unit?'<span class="unit">'+unit+'</span>':'')+'</div>'+
+    '<div class="kp" data-q="'+qid+'" data-s="'+(sub||'')+'">'+keys.map(function(k){ return '<button type="button" class="'+(/[0-9]/.test(k)?'':'sp')+'" data-k="'+k+'">'+k+'</button>'; }).join('')+'</div>';
+}
+function orderView(q){
+  var a = S.answers[q.id] || [], m = {}; q.steps.forEach(function(s){m[s[0]]=s[1]});
+  var slots = ''; for(var i=0;i<4;i++){ slots += '<div class="slot'+(a[i]?' full':'')+'" data-i="'+i+'"><span class="k">'+(i+1)+'</span><span>'+(a[i]?m[a[i]]:'<span style="color:#9ca3af">اضغطي خطوة من الأسفل…</span>')+'</span>'+(a[i]?'<span class="x">✕</span>':'')+'</div>'; }
+  return '<div class="slots">'+slots+'</div><div style="font-size:.85em;color:var(--muted);margin-bottom:6px">الخطوات المتاحة:</div><div class="pool">'+
+    q.steps.map(function(s){ return '<button class="step'+(a.indexOf(s[0])>=0?' used':'')+'" data-v="'+s[0]+'">'+s[1]+'</button>'; }).join('')+'</div>';
+}
+function classifyView(q){
+  var a = S.answers[q.id] || {}, ch = [['one','حل وحيد'],['none','لا يوجد حل'],['inf','عدد لا نهائي من الحلول']];
+  return '<div class="cls">'+q.rows.map(function(r){
+    return '<div class="crow"><div class="e">'+r[1]+'</div><div class="seg">'+ch.map(function(c){ return '<button class="'+(a[r[0]]===c[0]?'sel':'')+'" data-r="'+r[0]+'" data-v="'+c[0]+'">'+c[1]+'</button>'; }).join('')+'</div></div>';
+  }).join('')+'</div>';
+}
+function multiView(q){
+  var a = S.answers[q.id] || {};
+  var h = '<div class="note">'+q.work.map(function(w,i){ return '<div>'+w+(i?'<small>('+i+')</small>':'')+'</div>'; }).join('')+'</div>';
+  q.parts.forEach(function(p,i){
+    h += '<div class="sub"><div class="sh"><span class="sn" style="background:var(--l2s);color:#3730a3">'+LET[i]+'</span>'+p.label+'<span class="sp2">'+p.pts+' علامة</span></div>';
+    h += p.type==='mcq' ? mcqView(q.id, p.k, p.opts, a[p.k]) : numView(q.id, p.k, p.pre, '');
+    h += '</div>';
+  });
+  return h;
+}
+function art(k){
+  if(k==='rect') return '<svg viewBox="0 0 300 150" width="300" height="150" style="direction:ltr"><rect x="50" y="25" width="200" height="85" rx="8" fill="#fde68a" stroke="#d97706" stroke-width="3"/>'+
+    '<text x="150" y="134" text-anchor="middle" font-size="18" font-weight="800" fill="#92400e">2x + 3</text><text x="34" y="74" text-anchor="middle" font-size="18" font-weight="800" fill="#92400e">x</text>'+
+    '<text x="150" y="74" text-anchor="middle" font-size="16" font-weight="700" fill="#b45309">المحيط = 42 سم</text></svg>';
+  return '<svg viewBox="0 0 300 110" width="300" height="110"><g fill="none" stroke="#d97706" stroke-width="5" stroke-linecap="round"><circle cx="70" cy="70" r="28"/><circle cx="190" cy="70" r="28"/><path d="M70 70 L105 30 L160 30 L190 70 M105 30 L130 70 L160 30 M98 22 L114 22 M160 30 L168 16"/></g>'+
+    '<g font-weight="800" font-size="15"><rect x="226" y="18" width="66" height="34" rx="10" fill="#fef3c7"/><text x="259" y="40" text-anchor="middle" fill="#92400e">(أ) (ب)</text></g></svg>';
+}
+function trackView(q){
+  var t = S.tracks[q.id], a = S.answers[q.id] || {};
+  var h = '<div class="story">'+q.story+art(q.art)+'</div>';
+  if(!t){
+    return h + '<div class="qt" style="text-align:center">اختاري المسار الذي يناسبك لحل المسألة 👇</div>'+
+      '<div class="trk"><button class="s" data-t="support"><span class="ic">🧭</span><b>الخطوات الموجّهة</b><small>أحلّ المسألة خطوة بخطوة مع إرشاد في كل مرحلة</small><small style="margin-top:6px;font-weight:700;color:#065f46">4 علامات</small></button>'+
+      '<button class="c" data-t="challenge"><span class="ic">⚡</span><b>التحدي</b><small>أكتب المعادلة وأحلّها بنفسي، وأجيب عن سؤال إضافي</small><small style="margin-top:6px;font-weight:700;color:#9f1239">4 علامات</small></button></div>';
+  }
+  var empty = !Object.keys(a).some(function(k){return a[k] && String(a[k]).trim()});
+  h += '<div class="trkbar"><span class="badge '+(t==='support'?'s">🧭 مسار الخطوات الموجّهة':'c">⚡ مسار التحدي')+'</span>'+(empty?'<button class="link" id="chg">تغيير المسار</button>':'')+'</div>';
+  q[t].forEach(function(s,i){
+    h += '<div class="sub"><div class="sh"><span class="sn">'+(i+1)+'</span><span>'+s.label+'</span><span class="sp2">'+(s.pts===1?'علامة':'علامتان')+'</span></div>';
+    h += s.type==='mcq' ? mcqView(q.id, s.k, s.opts, a[s.k], s.opts.length===3) : numView(q.id, s.k, s.pre||'', s.unit||'');
+    h += '</div>';
+  });
+  return h;
+}
+
+function setAns(qid, sub, v){
+  if(sub){ var o = Object.assign({}, S.answers[qid]||{}); o[sub]=v; S.answers[qid]=o; }
+  else S.answers[qid]=v;
+  save(); progress(); refreshTabs();
+}
+function refreshTabs(){
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function(b){
+    var l=+b.dataset.l, ids=S.order.filter(function(x){return QBY[x].level===l}), d=ids.filter(function(x){return status(x)==='done'}).length;
+    var sm=b.querySelector('small'); if(sm) sm.textContent='('+d+'/'+ids.length+')';
+  });
+}
+
+function bind(q){
+  var root = $('#qc');
+  Array.prototype.forEach.call(root.querySelectorAll('.opt'), function(b){
+    b.onclick = function(){
+      Array.prototype.forEach.call(b.parentNode.querySelectorAll('.opt'), function(x){x.classList.remove('sel')});
+      b.classList.add('sel'); setAns(b.dataset.q, b.dataset.s, b.dataset.v);
+      if(q.type==='track'){ var c=$('#chg'); if(c) c.remove(); }
+    };
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.numbox input'), function(inp){
+    inp.oninput = function(){ setAns(inp.dataset.q, inp.dataset.s, inp.value); var c=$('#chg'); if(c && inp.value) c.remove(); };
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.kp'), function(kp){
+    var inp = kp.previousElementSibling.querySelector('input');
+    kp.onclick = function(e){
+      var b = e.target.closest('button'); if(!b) return;
+      var k = b.dataset.k, v = inp.value;
+      if(k==='⌫') v = v.slice(0,-1);
+      else if(k==='−') v = /^[−-]/.test(v) ? v.slice(1) : '−'+v;
+      else v += k;
+      inp.value = v; inp.oninput();
+    };
+  });
+  if(q.type==='order'){
+    Array.prototype.forEach.call(root.querySelectorAll('.step'), function(b){
+      b.onclick = function(){ var a=(S.answers[q.id]||[]).slice(); if(a.length<4 && a.indexOf(b.dataset.v)<0){ a.push(b.dataset.v); setAns(q.id,null,a); render(); } };
+    });
+    Array.prototype.forEach.call(root.querySelectorAll('.slot.full'), function(s){
+      s.onclick = function(){ var a=(S.answers[q.id]||[]).slice(); a.splice(+s.dataset.i,1); setAns(q.id,null,a); render(); };
+    });
+  }
+  if(q.type==='classify'){
+    Array.prototype.forEach.call(root.querySelectorAll('.seg button'), function(b){
+      b.onclick = function(){ Array.prototype.forEach.call(b.parentNode.children, function(x){x.classList.remove('sel')}); b.classList.add('sel');
+        var o=Object.assign({}, S.answers[q.id]||{}); o[b.dataset.r]=b.dataset.v; setAns(q.id,null,o); };
+    });
+  }
+  if(q.type==='track'){
+    Array.prototype.forEach.call(root.querySelectorAll('.trk button'), function(b){ b.onclick = function(){ S.tracks[q.id]=b.dataset.t; S.answers[q.id]={}; save(); render(); }; });
+    var c = $('#chg'); if(c) c.onclick = function(){ delete S.tracks[q.id]; S.answers[q.id]={}; save(); render(); };
+  }
+  var hb = $('#hb'); if(hb) hb.onclick = function(){ S.hints[q.id]=true; save(); render(); };
+  var sp = $('#sp'); if(sp) sp.onclick = function(){
+    try{ speechSynthesis.cancel(); var txt = root.innerText.replace(/[⌫▦]/g,' ').replace(/\n+/g,'، ').slice(0,700);
+      var u = new SpeechSynthesisUtterance(txt); u.lang='ar-SA'; u.rate=.9; speechSynthesis.speak(u); }catch(e){}
+  };
+}
+
+// ===================== خريطة الأسئلة والمراجعة =====================
+function mapHtml(){
+  return '<div class="map">'+S.order.map(function(id,i){ var q=QBY[id], st=status(id);
+    return '<button class="mc l'+q.level+' '+st+(i===S.idx?' cur':'')+'" data-i="'+i+'">'+(i+1)+'</button>'; }).join('')+'</div>'+
+    '<div class="legend"><span><i style="background:var(--l1)"></i>تأسيسي</span><span><i style="background:var(--l2)"></i>تطبيقي</span><span><i style="background:var(--l3)"></i>حل المشكلات</span><span><i style="border:2px dashed #f59e0b"></i>غير مكتمل</span><span><i style="border:2px solid #e5e7eb"></i>لم تُجَب</span></div>';
+}
+function modal(html){ $('#layer').innerHTML = '<div class="ov" id="ov"><div class="md">'+html+'</div></div>';
+  $('#ov').onclick = function(e){ if(e.target.id==='ov') close(); }; }
+function close(){ $('#layer').innerHTML=''; }
+function bindMap(){ Array.prototype.forEach.call(document.querySelectorAll('.mc'), function(b){ b.onclick=function(){ close(); go(+b.dataset.i); }; }); }
+function mapModal(){ modal('<h3>🗺️ خريطة الأسئلة</h3>'+mapHtml()+'<div style="margin-top:16px;display:flex;gap:8px"><button class="btn ghost" style="flex:1" id="cl">إغلاق</button><button class="btn pri" style="flex:1" id="rv2">مراجعة وتسليم</button></div>');
+  bindMap(); $('#cl').onclick=close; $('#rv2').onclick=review; }
+function review(){
+  var miss = [], part = [];
+  S.order.forEach(function(id,i){ var s=status(id); if(!s) miss.push(i+1); else if(s==='part') part.push(i+1); });
+  var msg = (!miss.length && !part.length) ? '<p>🎉 أجبتِ عن جميع الأسئلة. هل أنتِ متأكدة من التسليم؟</p>' :
+    '<p>'+(miss.length?'⚠️ لم تُجيبي عن: <b>'+miss.join('، ')+'</b><br>':'')+(part.length?'🟠 إجابات غير مكتملة: <b>'+part.join('، ')+'</b>':'')+'</p>';
+  modal('<h3>📋 مراجعة قبل التسليم</h3>'+msg+mapHtml()+
+   '<p style="font-size:.85em;color:var(--muted)">لا يمكن تعديل الإجابات بعد التسليم النهائي.</p>'+
+   '<div style="margin-top:12px;display:flex;gap:8px"><button class="btn ghost" style="flex:1" id="cl">رجوع للأسئلة</button><button class="btn pri" style="flex:1" id="sb">تسليم نهائي ✓</button></div>');
+  bindMap(); $('#cl').onclick=close; $('#sb').onclick=function(){ submit(false); };
+}
+
+// ===================== التسليم =====================
+var sending = false;
+function submit(auto){
+  if(sending || S.phase!=='exam') return; sending = true; clearInterval(tick);
+  modal('<div style="text-align:center;padding:20px"><div style="font-size:2.4em">📤</div><h3>جارٍ تسليم الاختبار…</h3><p style="color:var(--muted)">لا تغلقي الصفحة</p></div>');
+  var payload = {token:S.token, answers:S.answers, tracks:S.tracks, hints:Object.keys(S.hints||{}), blur:S.blur||0, auto:!!auto};
+  var ok = function(r){
+    sending = false;
+    if(!r || !r.ok){ fail(r && r.msg); return; }
+    S.phase='done'; S.doneAt=Date.now(); S.auto=!!auto; S.result={total:r.total, levels:r.levels, grade:r.grade}; if(EM){ markDone(); } if(!LIVE) S.result.perQ = r.perQ; save(); close(); result();
+  };
+  var fail = function(m){ sending=false;
+    modal('<div style="text-align:center"><div style="font-size:2.4em">📶</div><h3>لم يكتمل التسليم</h3><p>'+(m?esc(m):'تحققي من اتصال الإنترنت، إجاباتك محفوظة على الجهاز.')+'</p><button class="btn pri block" id="rt">إعادة المحاولة</button></div>');
+    $('#rt').onclick = function(){ submit(auto); };
+  };
+  if(LIVE) google.script.run.withSuccessHandler(ok).withFailureHandler(function(){ fail(); }).submitExam(payload);
+  else setTimeout(function(){ var r = scoreExam(S.answers, S.tracks); ok({ok:true,total:r.total,levels:r.levels,grade:gradeLabel(r.total),perQ:r.perQ}); }, 700);
+}
+
+function result(){
+  var r = S.result, t = r.total, pct = t/TOTAL;
+  var col = t>=27?'#16a34a':t>=24?'#0284c7':t>=20?'#7c3aed':t>=15?'#ca8a04':'#dc2626';
+  var msg = t>=27?'إنجاز رائع! أنتِ متمكّنة من حل المعادلات 🌟':t>=24?'أداء ممتاز، استمري بهذا التميّز 💪':t>=20?'عمل جيد! مع قليل من المراجعة ستصلين للقمة 🚀':t>=15?'أحسنتِ المحاولة، راجعي المهارات التي تحتاج تدريبًا 📚':'لا بأس، معلمتك ستساعدك في خطة دعم مناسبة 🤝';
+  var C = 2*Math.PI*88;
+  var h = '<div class="wrap">'+(LIVE||EM?'':'<div class="demo">نسخة معاينة — <a href="#" id="again">جرّبي مرة أخرى</a> · <a href="teacher.html">لوحة المعلمة</a></div>')+
+   '<div class="card res"><div style="font-size:1em;color:var(--muted)">تم تسليم اختبارك بنجاح ✅</div><h2 style="margin:4px 0">'+esc(S.name)+'</h2>'+
+   '<div class="ring"><svg width="210" height="210"><circle cx="105" cy="105" r="88" stroke="#f1f5f9" stroke-width="18" fill="none"/>'+
+   '<circle id="arc" cx="105" cy="105" r="88" stroke="'+col+'" stroke-width="18" fill="none" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'" style="transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)"/></svg>'+
+   '<div class="v"><b id="cnt">0</b><span>من 30</span></div></div>'+
+   '<div class="grade" style="background:'+col+'1a;color:'+col+'">'+esc(r.grade)+'</div><p style="margin:6px 0 0">'+msg+'</p>'+
+   '<div class="bars">'+[1,2,3].map(function(l){ var c=['','#10b981','#6366f1','#f59e0b'][l];
+      return '<div class="bar"><div class="lb"><span>'+LVL[l].ic+' '+LVL[l].name+'</span><span>'+r.levels[l]+' / '+LVL[l].max+'</span></div><div class="tr"><i data-w="'+(r.levels[l]/LVL[l].max*100)+'" style="background:'+c+'"></i></div></div>'; }).join('')+'</div>';
+  if(EM) h += sendBox();
+  if(!LIVE && !EM && r.perQ){
+    h += '<details style="margin-top:16px;text-align:start"><summary style="cursor:pointer;font-weight:700">🔍 تفاصيل التصحيح (للمعاينة فقط)</summary><div class="map" style="margin-top:10px">'+
+      S.order.map(function(id,i){ var g=r.perQ[id], mx2=QBY[id].pts; return '<div class="mc" style="font-size:.75em;background:'+(g===mx2?'#dcfce7':g>0?'#fef9c3':'#fee2e2')+'">'+(i+1)+'<br>'+g+'/'+mx2+'</div>'; }).join('')+'</div></details>';
+  }
+  h += EM ? '</div></div>' : '<p style="color:var(--muted);font-size:.85em;margin-top:18px">وصلت نتيجتك إلى معلمتك. يمكنك إغلاق الصفحة الآن.</p></div></div>';
+  $('#app').innerHTML = h;
+  setTimeout(function(){ $('#arc').style.strokeDashoffset = C*(1-pct);
+    Array.prototype.forEach.call(document.querySelectorAll('.bar i'), function(i){ i.style.width=i.dataset.w+'%'; }); }, 80);
+  var k=0, step=Math.max(1,Math.round(t/30*2)/2), iv=setInterval(function(){ k=Math.min(t,k+0.5); $('#cnt').textContent=(k%1?k.toFixed(1):k); if(k>=t) clearInterval(iv); }, 1200/Math.max(1,t*2));
+  if(t>=24) confetti();
+  var cpm=$('#cpm'); if(cpm) cpm.onclick=function(){ var t=window._mailText; try{ navigator.clipboard.writeText(t).then(function(){toast('✅ نُسخت الرسالة — الصقيها في بريد جديد للمعلمة');},function(){prompt2(t);}); }catch(e){ prompt2(t); } };
+  var ag = $('#again'); if(ag) ag.onclick = function(e){ e.preventDefault(); try{localStorage.removeItem(STORE)}catch(x){} S={phase:'welcome'}; welcome(); };
+}
+function localDone(n,sec){ try{ var d=JSON.parse(localStorage.getItem(STORE+'_done')||'[]'); return d.indexOf(n+'|'+sec)>=0; }catch(e){ return false; } }
+function markDone(){ try{ var d=JSON.parse(localStorage.getItem(STORE+'_done')||'[]'); d.push(S.name+'|'+S.section); localStorage.setItem(STORE+'_done',JSON.stringify(d)); }catch(e){} }
+function chk(str){ var h=5381, s2=str+'|'+EM.salt; for(var i=0;i<s2.length;i++){ h=((h<<5)+h+s2.charCodeAt(i))|0; } return (h>>>0).toString(36).toUpperCase(); }
+function dataLine(){
+  var r=S.result, pq=S.order.slice().sort(function(a,b){return +a.slice(1)-+b.slice(1)}).map(function(q){return r.perQ[q]}).join('');
+  var tr=function(q){ var t=(S.tracks||{})[q]; return t==='challenge'?'c':t==='support'?'s':'-'; };
+  var mins=Math.round(((S.doneAt||Date.now())-S.startedAt)/6000)/10;
+  var parts=['EQ8R','1',S.name.replace(/[|\n]/g,' '),S.section.replace(/[|\n]/g,' '),r.total,r.levels[1],r.levels[2],r.levels[3],pq,tr('q17')+tr('q18'),Object.keys(S.hints||{}).length,S.blur||0,mins,S.auto?1:0,S.doneAt||Date.now()];
+  var body=parts.join('|'); return body+'|'+chk(body);
+}
+function sendBox(){
+  var r=S.result, line=dataLine();
+  var subj='نتيجة اختبار المعادلات | '+S.name+' | '+S.section+' | '+r.total+'/30';
+  var body='السلام عليكم أستاذتي،\nهذه نتيجتي في اختبار الوحدة الثانية (المعادلات):\n\nالاسم: '+S.name+'\nالشعبة: '+S.section+'\nالعلامة: '+r.total+' / 30 ('+r.grade+')\nالمستوى 1: '+r.levels[1]+'/10 — المستوى 2: '+r.levels[2]+'/12 — المستوى 3: '+r.levels[3]+'/8\n\nرمز التحقق (لا تعدّليه):\n'+line+'\n';
+  var e=encodeURIComponent, to=EM.email;
+  var gm='https://mail.google.com/mail/?view=cm&fs=1&to='+e(to)+'&su='+e(subj)+'&body='+e(body);
+  var ol='https://outlook.office.com/mail/deeplink/compose?to='+e(to)+'&subject='+e(subj)+'&body='+e(body);
+  var mt='mailto:'+to+'?subject='+e(subj)+'&body='+e(body);
+  window._mailText = 'إلى: '+to+'\nالموضوع: '+subj+'\n\n'+body;
+  return '<div style="margin-top:20px;background:linear-gradient(135deg,#fdf4ff,#eef2ff);border:2px solid #c4b5fd;border-radius:20px;padding:16px;text-align:center">'+
+   '<div style="font-size:1.6em">📨</div><b style="font-size:1.1em">خطوة أخيرة مهمة: أرسلي نتيجتك لمعلمتك</b>'+
+   '<p style="margin:6px 0 12px;font-size:.9em;color:#4b5563">اضغطي أحد الأزرار، ثم اضغطي <b>إرسال</b> في تطبيق البريد دون تعديل الرسالة.</p>'+
+   '<div style="display:grid;gap:8px">'+
+   '<a class="btn pri block" style="text-decoration:none" href="'+esc(ol)+'" target="_blank" rel="noopener">✉️ إرسال عبر Outlook (بريد المدرسة)</a>'+
+   '<a class="btn pri block" style="text-decoration:none;background:linear-gradient(135deg,#dc2626,#f97316)" href="'+esc(gm)+'" target="_blank" rel="noopener">✉️ إرسال عبر Gmail</a>'+
+   '<a class="btn ghost block" style="text-decoration:none" href="'+esc(mt)+'">📱 تطبيق البريد في الجهاز</a>'+
+   '<button class="btn ghost block" id="cpm">📋 نسخ الرسالة لإرسالها يدويًا</button></div>'+
+   '<p style="font-size:.85em;margin:10px 0 0;color:#6b7280">بريد المعلمة: <span dir="ltr" style="font-weight:700;color:#4c1d95">'+esc(to)+'</span></p></div>';
+}
+function confetti(){
+  var d=document.createElement('div'); d.className='conf'; var cs=['#a855f7','#ec4899','#f59e0b','#10b981','#6366f1','#06b6d4'];
+  for(var i=0;i<90;i++){ var e=document.createElement('i'); e.style.left=Math.random()*100+'%'; e.style.background=cs[i%cs.length];
+    e.style.animationDuration=(2+Math.random()*2.5)+'s'; e.style.animationDelay=(Math.random()*.8)+'s'; e.style.transform='rotate('+Math.random()*180+'deg)'; d.appendChild(e); }
+  document.body.appendChild(d); setTimeout(function(){d.remove()},5500);
+}
+function prompt2(t){ modal('<h3>انسخي الرسالة</h3><textarea style="width:100%;height:220px;font-family:inherit;direction:rtl" readonly>'+esc(t)+'</textarea><button class="btn pri block" id="cl" style="margin-top:10px">تم</button>'); $('#cl').onclick=close; var ta=document.querySelector('.md textarea'); ta.focus(); ta.select(); }
+function toast(m){ var t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(function(){t.remove()},3200); }
+
+// ===================== النزاهة =====================
+document.addEventListener('visibilitychange', function(){
+  if(S.phase!=='exam') return;
+  if(document.hidden){ S.blur=(S.blur||0)+1; save(); }
+  else toast('⚠️ تم تسجيل مغادرة صفحة الاختبار ('+S.blur+')');
+});
+
+// ===================== البدء =====================
+if(S.phase==='exam'){ if(Date.now() >= S.endAt){ exam(); } else exam(); }
+else if(S.phase==='done') result();
+else welcome();
+})();
+</script>
+</body>
+</html>

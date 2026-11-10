@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المعلمة — اختبار المعادلات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--ink:#1e1b4b;--muted:#6b7280;--line:#ece8ff;--l1:#10b981;--l2:#6366f1;--l3:#f59e0b}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Tajawal',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#f5f3ff,#ecfeff);min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:0;font-size:inherit;color:inherit;background:none}
+.wrap{max-width:1000px;margin:0 auto;padding:18px 14px 60px}
+.card{background:#fff;border-radius:20px;padding:18px;border:1px solid var(--line);box-shadow:0 10px 28px -20px #4c1d9566;margin-top:14px}
+.card h3{margin:0 0 10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:12px;font-weight:700;font-size:.92em;text-decoration:none}
+.pri{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff}
+.gh{background:#f3f0ff;color:#5b21b6}
+.tabs{display:flex;gap:8px;margin-top:14px}
+.tab{flex:1;padding:12px;border-radius:14px;background:#fff;border:2px solid var(--line);font-weight:800}
+.tab.on{border-color:#7c3aed;background:#f5f3ff;color:#5b21b6}
+.codebig{font-size:2.6em;font-weight:800;letter-spacing:.3em;direction:ltr;color:#5b21b6}
+#qr{display:inline-block;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff}
+textarea{width:100%;min-height:150px;border-radius:14px;border:2px solid var(--line);padding:12px;font-family:inherit;font-size:.9em;background:#faf9ff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.st{border-radius:16px;padding:12px;background:#faf9ff;border:1px solid var(--line)}
+.st small{color:var(--muted);font-weight:700;font-size:.8em}.st b{display:block;font-size:1.7em}
+.tbl{width:100%;border-collapse:separate;border-spacing:0 5px;font-size:.88em}
+.tbl th{font-size:.78em;color:var(--muted);padding:4px}
+.tbl td{background:#faf9ff;padding:9px 6px;text-align:center}
+.tbl td.nm{text-align:start;font-weight:700}
+.gb{display:inline-block;padding:2px 9px;border-radius:99px;font-weight:700;font-size:.82em;white-space:nowrap}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.it{display:grid;grid-template-columns:40px 1fr 44px;gap:6px;align-items:center;font-size:.82em;padding:6px 8px;border-radius:12px;background:#faf9ff}
+.trk{height:7px;border-radius:99px;background:#eef2ff;overflow:hidden;margin-top:3px}.trk i{display:block;height:100%}
+.warn{background:#fef2f2;color:#991b1b;border-radius:12px;padding:10px;font-size:.88em;margin-top:10px}
+.full{position:fixed;inset:0;background:#fff;z-index:60;display:grid;place-items:center;text-align:center}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:10px 16px;border-radius:12px;z-index:70}
+.steps{margin:0;padding-inline-start:20px;font-size:.92em;color:#374151}.steps li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+<script>
+// ===================== مفتاح التصحيح (لا يُرسل إلى أجهزة الطالبات) =====================
+// المجموع: المستوى 1 = 10 ، المستوى 2 = 12 ، المستوى 3 = 8  →  30 علامة
+var EXAM_TOTAL = 30;
+var EXAM_MINUTES = 45;
+
+var SCORING = {
+  // ---------- المستوى 1: تأسيسي (علامة لكل سؤال) ----------
+  q1:  { level: 1, max: 1, type: 'mcq', ans: 'b', label: 'x ÷ 4 = 3' },
+  q2:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: '(2/3)x = 10' },
+  q3:  { level: 1, max: 1, type: 'mcq', ans: 'd', label: '3x + 5 = 20' },
+  q4:  { level: 1, max: 1, type: 'mcq', ans: 'a', label: '−2x − 7 = 9' },
+  q5:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: 'x/5 − 4 = 2' },
+  q6:  { level: 1, max: 1, type: 'mcq', ans: 'b', label: '5x = 2x + 18' },
+  q7:  { level: 1, max: 1, type: 'mcq', ans: 'd', label: '7x − 4 = 3x + 12' },
+  q8:  { level: 1, max: 1, type: 'mcq', ans: 'a', label: '4(x − 2) = 20' },
+  q9:  { level: 1, max: 1, type: 'mcq', ans: 'c', label: 'معادلة ليس لها حل' },
+  q10: { level: 1, max: 1, type: 'mcq', ans: 'b', label: 'كتابة معادلة من جملة' },
+  // ---------- المستوى 2: تطبيقي (علامتان لكل سؤال) ----------
+  q11: { level: 2, max: 2, type: 'num', ans: 8, label: '0.4x − 1.2 = 2' },
+  q12: { level: 2, max: 2, type: 'num', ans: -4, label: '−3(x + 4) = 2x + 8' },
+  q13: { level: 2, max: 2, type: 'num', ans: 6, label: '2(3x − 1) − 4x = 10' },
+  q14: { level: 2, max: 2, type: 'order', ans: ['p', 'k', 'w', 'm'], label: 'ترتيب خطوات الحل' },
+  q15: { level: 2, max: 2, type: 'classify', ans: { a: 'inf', b: 'none', c: 'one' }, label: 'عدد الحلول' },
+  q16: { level: 2, max: 2, type: 'multi', label: 'تحليل الخطأ',
+         parts: { a: { type: 'mcq', ans: 'b', pts: 1 }, b: { type: 'num', ans: 6, pts: 1 } } },
+  // ---------- المستوى 3: حل المشكلات (4 علامات لكل مسألة، بمسارين) ----------
+  q17: { level: 3, max: 4, type: 'track', label: 'مسألة تأجير الدراجات',
+         support:   { g1: { type: 'mcq', ans: 'c', pts: 1 }, g2: { type: 'mcq', ans: 'b', pts: 1 },
+                      g3: { type: 'num', ans: 5, pts: 1 },   g4: { type: 'num', ans: 45, pts: 1 } },
+         challenge: { c1: { type: 'num', ans: 5, pts: 2 },   c2: { type: 'num', ans: 45, pts: 1 },
+                      c3: { type: 'mcq', ans: 'a', pts: 1 } } },
+  q18: { level: 3, max: 4, type: 'track', label: 'مسألة محيط المستطيل',
+         support:   { g1: { type: 'mcq', ans: 'd', pts: 1 }, g2: { type: 'mcq', ans: 'b', pts: 1 },
+                      g3: { type: 'num', ans: 6, pts: 1 },   g4: { type: 'num', ans: 15, pts: 1 } },
+         challenge: { c1: { type: 'num', ans: 6, pts: 2 },   c2: { type: 'num', ans: 15, pts: 1 },
+                      c3: { type: 'num', ans: 90, pts: 1 } } }
+};
+
+// المعادلات تُعرض من اليسار لليمين داخل الجداول العربية
+(function () { for (var k in SCORING) if (!/[؀-ۿ]/.test(SCORING[k].label)) SCORING[k].label = '‎' + SCORING[k].label + '‎'; })();
+
+var QUESTION_IDS = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18'];
+
+// يقبل الأرقام العربية والهندية، والكسور a/b، والفاصلة العشرية، وإشارة السالب بأشكالها
+function parseNum(s) {
+  if (s === null || s === undefined) return NaN;
+  s = String(s).trim();
+  if (!s) return NaN;
+  var map = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
+              '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9' };
+  s = s.replace(/[٠-٩۰-۹]/g, function (c) { return map[c]; })
+       .replace(/[−–—‐]/g, '-').replace(/[٫,]/g, '.').replace(/\s+/g, '')
+       .replace(/^x=/i, '').replace(/^[a-z]=/i, '');
+  var m = s.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if (m) { var d = parseFloat(m[2]); return d === 0 ? NaN : parseFloat(m[1]) / d; }
+  if (!/^-?\d*\.?\d+$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+
+function numEq(a, b) { var x = parseNum(a); return !isNaN(x) && Math.abs(x - b) < 1e-6; }
+
+function scorePart(spec, val) {
+  if (spec.type === 'mcq') return val === spec.ans ? spec.pts : 0;
+  if (spec.type === 'num') return numEq(val, spec.ans) ? spec.pts : 0;
+  return 0;
+}
+
+// answers: { q1:'b', q11:'8', q14:['p','k','w','m'], q15:{a:'inf',...}, q16:{a:'b',b:'6'}, q17:{g1:'c',...} }
+// tracks:  { q17:'support' | 'challenge', q18: ... }
+function scoreExam(answers, tracks) {
+  answers = answers || {}; tracks = tracks || {};
+  var perQ = {}, levels = { 1: 0, 2: 0, 3: 0 }, total = 0;
+  QUESTION_IDS.forEach(function (id) {
+    var sp = SCORING[id], a = answers[id], p = 0;
+    if (sp.type === 'mcq') p = a === sp.ans ? sp.max : 0;
+    else if (sp.type === 'num') p = numEq(a, sp.ans) ? sp.max : 0;
+    else if (sp.type === 'order') {
+      var ok = 0;
+      if (Object.prototype.toString.call(a) === '[object Array]')
+        for (var i = 0; i < sp.ans.length; i++) if (a[i] === sp.ans[i]) ok++;
+      p = ok === sp.ans.length ? 2 : (ok >= 2 ? 1 : 0);
+    } else if (sp.type === 'classify') {
+      var c = 0; a = a || {};
+      for (var k in sp.ans) if (a[k] === sp.ans[k]) c++;
+      p = c === 3 ? 2 : (c === 2 ? 1 : 0);
+    } else if (sp.type === 'multi') {
+      a = a || {};
+      for (var pk in sp.parts) p += scorePart(sp.parts[pk], a[pk]);
+    } else if (sp.type === 'track') {
+      var tr = tracks[id] === 'challenge' ? 'challenge' : (tracks[id] === 'support' ? 'support' : null);
+      a = a || {};
+      if (tr) for (var sk in sp[tr]) p += scorePart(sp[tr][sk], a[sk]);
+    }
+    perQ[id] = p; levels[sp.level] += p; total += p;
+  });
+  return { total: total, levels: levels, perQ: perQ };
+}
+
+function gradeLabel(total) {
+  if (total >= 27) return 'ممتاز';
+  if (total >= 24) return 'جيد جدًا';
+  if (total >= 20) return 'جيد';
+  if (total >= 15) return 'مقبول';
+  return 'بحاجة إلى دعم';
+}
+
+var EMAIL_CFG={"email": "leen.albrdan95@gmail.com", "code": "EQ8", "pin": "2468", "salt": "m8-eq-uae-26", "url": "https://leenalbrdan95-del.github.io/Leen/"};
+</script>
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var GC={'ممتاز':'#16a34a','جيد جدًا':'#0284c7','جيد':'#7c3aed','مقبول':'#ca8a04','بحاجة إلى دعم':'#dc2626'};
+var MAX=[1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,4,4];
+var tab='access', rows=[], bad=0, raw='';
+try{ raw=localStorage.getItem('eq8_teacher_paste')||''; }catch(e){}
+function chk(str){ var h=5381, s2=str+'|'+EMAIL_CFG.salt; for(var i=0;i<s2.length;i++){ h=((h<<5)+h+s2.charCodeAt(i))|0; } return (h>>>0).toString(36).toUpperCase(); }
+var url = EMAIL_CFG.url + '#' + EMAIL_CFG.code;
+
+function gate(){
+  var ok=false; try{ ok=sessionStorage.getItem('eq8_t')==='1'; }catch(e){}
+  if(ok) return render();
+  $('#app').innerHTML='<div class="card" style="max-width:380px;margin:60px auto;text-align:center"><div style="font-size:2.4em">👩‍🏫</div><h3>لوحة المعلمة</h3><input id="pn" inputmode="numeric" placeholder="الرقم السري" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--line);font-size:1.3em;text-align:center;letter-spacing:.3em"><div id="er" style="color:#dc2626;min-height:1.4em;margin:6px 0"></div><button class="btn pri" id="go" style="width:100%">دخول</button><p style="margin-top:14px"><a href="index.html" style="color:#7c3aed">→ العودة لصفحة الاختبار</a></p></div>';
+  var go=function(){ if($('#pn').value===EMAIL_CFG.pin){ try{sessionStorage.setItem('eq8_t','1')}catch(e){} render(); } else $('#er').textContent='الرقم السري غير صحيح'; };
+  $('#go').onclick=go; $('#pn').onkeydown=function(e){ if(e.key==='Enter') go(); };
+}
+
+function parse(text){
+  var found={}, list=[]; bad=0;
+  (text.match(/EQ8R\|[^\n\r]+/g)||[]).forEach(function(l){
+    l=l.trim().replace(/\s+$/,''); var p=l.split('|'); if(p.length<16){ bad++; return; }
+    var c=p.pop(), body=p.join('|');
+    if(chk(body)!==c){ bad++; return; }
+    var key=p[2]+'|'+p[3]+'|'+p[15]; if(found[key]) return; found[key]=1;
+    var pq=p[8].split('').map(Number), tot=+p[4];
+    list.push({name:p[2],section:p[3],total:tot,l1:+p[5],l2:+p[6],l3:+p[7],pq:pq,tr:p[9],hints:+p[10],blur:+p[11],mins:+p[12],auto:p[13]==='1',ts:+p[14],grade:gradeLabel(tot)});
+  });
+  // نفس الطالبة أكثر من مرة: نحتفظ بأول محاولة
+  var seen={}; list.sort(function(a,b){return a.ts-b.ts}).forEach(function(r){ var k=r.name.trim()+'|'+r.section; r.dup=!!seen[k]; seen[k]=1; });
+  return list;
+}
+
+function render(){
+  var h='<header style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1"><h2 style="margin:0">📊 لوحة المعلمة · اختبار المعادلات</h2><small style="color:var(--muted)">الصف الثامن · الوحدة الثانية · من 30</small></div><a class="btn gh" href="index.html">صفحة الطالبات ←</a></header>'+
+   '<div class="tabs"><button class="tab'+(tab==='access'?' on':'')+'" data-t="access">🔑 دخول الطالبات</button><button class="tab'+(tab==='grades'?' on':'')+'" data-t="grades">🧾 كشف العلامات</button></div>';
+  if(tab==='access'){
+    h+='<div class="card" style="text-align:center"><div id="qr"></div><div style="color:var(--muted);margin-top:8px">رمز الاختبار</div><div class="codebig">'+esc(EMAIL_CFG.code)+'</div>'+
+     '<div style="font-size:.75em;color:var(--muted);direction:ltr;word-break:break-all">'+esc(url)+'</div>'+
+     '<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap"><button class="btn pri" id="fq">⛶ عرض على السبورة</button><button class="btn gh" id="cu">🔗 نسخ رابط الطالبات</button></div></div>'+
+     '<div class="card"><h3>📌 كيف تصلك النتائج؟</h3><ol class="steps"><li>تمسح الطالبة الرمز أو تفتح الرابط، ثم تحل الاختبار خلال 45 دقيقة.</li><li>بعد التسليم تضغط «إرسال النتيجة»، فتصلك رسالة على <b dir="ltr">'+esc(EMAIL_CFG.email)+'</b> عنوانها فيه الاسم والعلامة من 30.</li><li>لكشف كامل مع التحليل: انسخي نص الرسائل والصقيه في تبويب «كشف العلامات».</li></ol></div>';
+  } else {
+    var st=stats(rows.filter(function(r){return !r.dup}));
+    h+='<div class="card"><h3>📥 الصقي رسائل الطالبات هنا</h3><p style="font-size:.88em;color:var(--muted);margin:0 0 8px">في بريدك ابحثي عن «نتيجة اختبار المعادلات»، ثم انسخي نص الرسائل (رسالة أو أكثر في كل مرة) والصقيه هنا. تُقرأ رموز التحقق تلقائيًا، وتُستبعد الرسائل المكررة أو المعدّلة.</p>'+
+     '<textarea id="ta" placeholder="الصقي هنا…">'+esc(raw)+'</textarea><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn pri" id="an">تحليل النتائج</button><button class="btn gh" id="cl">مسح</button></div>'+
+     (bad?'<div class="warn">⚠️ '+bad+' رمز تحقق غير صالح (الرسالة مُعدّلة أو منقوصة) ولم يُحتسب.</div>':'')+'</div>';
+    if(rows.length){
+      h+='<div class="card"><div class="stats">'+[['👩‍🎓 عدد الطالبات',st.n],['📈 المتوسط',st.avg+' / 30'],['🏅 أعلى · أدنى',st.max+' · '+st.min],['✅ نسبة النجاح',st.pass+'%'],['🌱 م1',st.l1+' / 10'],['🚀 م2',st.l2+' / 12'],['🏆 م3',st.l3+' / 8']].map(function(x){return '<div class="st"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>'}).join('')+'</div></div>'+
+       '<div class="card"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="flex:1;margin:0">🧾 كشف العلامات</h3><button class="btn pri" id="cx">📋 نسخ للصق في Excel</button></div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>#</th><th>اسم الطالبة</th><th>الشعبة</th><th>العلامة /30</th><th>م1</th><th>م2</th><th>م3</th><th>التقدير</th><th>ملاحظات</th></tr></thead><tbody>'+
+       sorted().map(function(r,i){ var n=[]; if(r.tr.indexOf('c')>=0) n.push('⚡ تحدي'); if(r.hints) n.push('💡'+r.hints); if(r.blur) n.push('👁️'+r.blur); if(r.auto) n.push('⏰'); if(r.dup) n.push('🔁 محاولة مكررة — لا تُحتسب');
+         return '<tr style="'+(r.dup?'opacity:.45':'')+'"><td>'+(i+1)+'</td><td class="nm">'+esc(r.name)+'</td><td>'+esc(r.section)+'</td><td style="font-weight:800;color:'+GC[r.grade]+'">'+r.total+'</td><td>'+r.l1+'</td><td>'+r.l2+'</td><td>'+r.l3+'</td><td><span class="gb" style="background:'+GC[r.grade]+'1a;color:'+GC[r.grade]+'">'+r.grade+'</span></td><td style="font-size:.85em">'+(n.join(' · ')||'—')+'</td></tr>'; }).join('')+
+       '</tbody></table></div><div style="font-size:.78em;color:var(--muted);margin-top:6px">⚡ اختارت مسار التحدي · 💡 عدد التلميحات · 👁️ مرات مغادرة الصفحة · ⏰ تسليم تلقائي</div></div>'+
+       '<div class="card"><h3>🎯 تحليل الأسئلة (نسبة الإتقان)</h3><div class="items">'+st.items.map(function(it){ var c=it.pct>=80?'#16a34a':it.pct>=50?'#ca8a04':'#dc2626';
+         return '<div class="it"><b style="color:var(--l'+it.level+')">س'+it.n+'</b><div><div dir="auto" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(it.label)+'</div><div class="trk"><i style="width:'+it.pct+'%;background:'+c+'"></i></div></div><b style="color:'+c+'">'+it.pct+'%</b></div>'; }).join('')+'</div></div>';
+    }
+  }
+  $('#app').innerHTML=h; bind();
+}
+function sorted(){ return rows.slice().sort(function(a,b){ return (a.dup-b.dup) || b.total-a.total || a.name.localeCompare(b.name,'ar'); }); }
+function stats(rs){
+  var n=rs.length, t=rs.map(function(r){return r.total}), avg=function(k){ return n?Math.round(rs.reduce(function(a,r){return a+r[k]},0)/n*10)/10:0; };
+  return {n:n,avg:avg('total'),max:n?Math.max.apply(null,t):0,min:n?Math.min.apply(null,t):0,pass:n?Math.round(rs.filter(function(r){return r.total>=15}).length/n*100):0,l1:avg('l1'),l2:avg('l2'),l3:avg('l3'),
+    items:MAX.map(function(m,i){ var id='q'+(i+1), g=rs.reduce(function(a,r){return a+(r.pq[i]||0)},0); return {n:i+1,level:i<10?1:i<16?2:3,label:SCORING[id].label,pct:n?Math.round(g/(n*m)*100):0}; })};
+}
+function bind(){
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(b){ b.onclick=function(){ tab=b.dataset.t; render(); }; });
+  if($('#qr') && typeof QRCode!=='undefined') new QRCode($('#qr'),{text:url,width:230,height:230});
+  if($('#fq')) $('#fq').onclick=function(){
+    $('#layer').innerHTML='<div class="full" id="fl"><div><h1 style="margin:0 0 10px;font-size:2.2em">اختبار الوحدة الثانية · المعادلات ✨</h1><div id="qr2" style="display:inline-block;padding:14px;border:1px solid var(--line);border-radius:20px"></div><div style="color:var(--muted);margin-top:10px;font-size:1.3em">امسحي الرمز أو اكتبي رمز الاختبار:</div><div class="codebig" style="font-size:5em">'+esc(EMAIL_CFG.code)+'</div><div style="color:var(--muted)">(اضغطي للإغلاق)</div></div></div>';
+    var z=Math.min(420,innerHeight*0.5); if(typeof QRCode!=='undefined') new QRCode($('#qr2'),{text:url,width:z,height:z}); $('#fl').onclick=function(){ $('#layer').innerHTML=''; };
+  };
+  if($('#cu')) $('#cu').onclick=function(){ copy(url,'✅ نُسخ رابط الطالبات'); };
+  if($('#an')) $('#an').onclick=function(){ raw=$('#ta').value; try{localStorage.setItem('eq8_teacher_paste',raw)}catch(e){} rows=parse(raw); render(); if(!rows.length) toast('لم يُعثر على رموز تحقق في النص'); };
+  if($('#cl')) $('#cl').onclick=function(){ raw=''; rows=[]; try{localStorage.removeItem('eq8_teacher_paste')}catch(e){} render(); };
+  if($('#cx')) $('#cx').onclick=function(){
+    var t=['اسم الطالبة','الشعبة','العلامة /30','المستوى 1 /10','المستوى 2 /12','المستوى 3 /8','التقدير'].concat(MAX.map(function(m,i){return 'س'+(i+1)})).join('\t')+'\n'+
+      sorted().filter(function(r){return !r.dup}).map(function(r){ return [r.name,r.section,r.total,r.l1,r.l2,r.l3,r.grade].concat(r.pq).join('\t'); }).join('\n');
+    copy(t,'✅ نُسخ الكشف — الصقيه في Excel');
+  };
+}
+function copy(t,m){ try{ navigator.clipboard.writeText(t).then(function(){toast(m)},function(){toast('تعذّر النسخ')}); }catch(e){ toast('تعذّر النسخ'); } }
+function toast(m){ var d=document.createElement('div'); d.className='toast'; d.textContent=m; document.body.appendChild(d); setTimeout(function(){d.remove()},3000); }
+if(raw) rows=parse(raw);
+gate();
+})();
+</script>
+</body>
+</html>
